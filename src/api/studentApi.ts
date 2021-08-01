@@ -1,7 +1,7 @@
 import { ListResponse,Student, ListParams } from './../models';
 import axiosClient from "./axiosClient"
 
-const sudentApi = {
+const studentApi = {
     getAll(params: ListParams): Promise<ListResponse<Student>> {
         const url = '/students'
         return axiosClient.get(url, {params})
@@ -28,4 +28,4 @@ const sudentApi = {
         return axiosClient.delete(url)
     },
 }
-export default sudentApi
+export default studentApi
