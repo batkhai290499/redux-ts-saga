@@ -35,7 +35,6 @@ export default function Dashboard() {
    const lowestStudentList = useAppSelector(selectLowestStudentList);
    const rankingByCityList = useAppSelector(selectRankingByCityList);
 
-   console.log(rankingByCityList);
    const classes = useStyles();
 
    React.useEffect(() => {

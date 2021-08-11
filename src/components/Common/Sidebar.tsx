@@ -4,7 +4,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { PeopleAlt } from '@material-ui/icons';
-import DraftsIcon from '@material-ui/icons/Drafts';
 import InboxIcon from '@material-ui/icons/Inbox';
 import React from 'react';
 import { NavLink } from 'react-router-dom';

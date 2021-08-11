@@ -1,6 +1,6 @@
+import { takeLatest } from '@redux-saga/core/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { takeEvery, takeLatest } from '@redux-saga/core/effects';
-import { increment, incrementBySaga } from './counterSlice';
+import { incrementBySaga } from './counterSlice';
 
 function* handleIncrementSaga(action: PayloadAction<number>) {
 }

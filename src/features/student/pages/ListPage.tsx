@@ -1,10 +1,18 @@
+import { Box, Button, makeStyles, Typography, LinearProgress } from '@material-ui/core';
+import { Pagination } from '@material-ui/lab';
+import { selectCityList, selectCityMap } from 'features/city/citySlice';
+import { ListParams, Student } from 'models';
 import React, { useEffect } from 'react';
-import { Box, makeStyles, Typography, Button } from '@material-ui/core';
-import { useRouteMatch } from 'react-router-dom';
-import { useAppDispatch } from '../../../app/hooks';
-import { selectStudentList, studentAction } from '../studentSlice';
-import { useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { StudentFilter } from '../components/StudentFilters';
 import StudentTable from '../components/StudentTable';
+import {
+   selectStudentFilter,
+   selectStudentList,
+   selectStudentPagination,
+   studentAction,
+} from '../studentSlice';
+import { selectStudentLoading } from '../studentSlice';
 
 export interface IListPageProps {}
 
@@ -15,25 +23,52 @@ const useStyles = makeStyles((theme) => ({
       flexFlow: 'row nowrap',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: theme.spacing(4)
+      marginBottom: theme.spacing(4),
+   },
+   loading: {
+      position: 'absolute',
+      // top: theme.spacing(-1),
+      width: '100%',
+      // alignItems: 'center'
    },
 }));
 export function ListPage(props: IListPageProps) {
-   const studentList = useSelector(selectStudentList);
+   const studentList = useAppSelector(selectStudentList);
+   const pagination = useAppSelector(selectStudentPagination);
+   const filter = useAppSelector(selectStudentFilter);
+   const loading = useAppSelector(selectStudentLoading);
+   const cityMap = useAppSelector(selectCityMap);
+   const cityList = useAppSelector(selectCityList);
    const dispatch = useAppDispatch();
    const classes = useStyles();
-    const onEdit = () => {
-        console.log("edit");
-        
-    }
+
    useEffect(() => {
+      dispatch(studentAction.fetchStudentList(filter));
+   }, [dispatch, filter]);
+   const handlePageChange = (e: any, page: number) => {
       dispatch(
-         studentAction.fetchStudentList({
-            _page: 1,
-            _limit: 15,
+         studentAction.setFilter({
+            ...filter,
+            _page: page,
          })
       );
-   });
+   };
+   const handleSearchChange = (newFilter: ListParams) => {
+      dispatch(studentAction.setFilterWithDebounce(newFilter));
+   };
+   const handleFilterChange = (newFilter: ListParams) => {
+      dispatch(studentAction.setFilter(newFilter));
+   };
+   const handleRemoveStudent = async (student: Student) => {
+      let newFilter = { ...filter };
+      try {
+         // await studentApi.remove(student?.id || '');
+         dispatch(studentAction.deleteStudent(student?.id || ''));
+         dispatch(studentAction.setFilter(newFilter));
+      } catch (error) {
+         console.log(error);
+      }
+   };
    return (
       <Box className={classes.root}>
          <Box className={classes.titleContainer}>
@@ -42,8 +77,27 @@ export function ListPage(props: IListPageProps) {
                Add new
             </Button>
          </Box>
+
+         <Box mb={3}>
+            <StudentFilter
+               filter={filter}
+               cityList={cityList}
+               onSearchChange={handleSearchChange}
+               onChange={handleFilterChange}
+            />
+         </Box>
          {/* Table Student */}
-         <StudentTable studentList={studentList}  onEdit={onEdit} onRemove={onEdit}/>
+         {loading && <LinearProgress className={classes.loading} />}
+         <StudentTable studentList={studentList} cityMap={cityMap} onRemove={handleRemoveStudent} />
+
+         <Box mt={2} display='flex' justifyContent='center'>
+            <Pagination
+               color='primary'
+               count={Math.ceil(pagination._totalRows / pagination._limit)}
+               page={pagination._page}
+               onChange={handlePageChange}
+            />
+         </Box>
       </Box>
    );
 }

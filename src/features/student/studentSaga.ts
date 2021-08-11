@@ -1,6 +1,6 @@
 import { Student } from './../../models/student';
 import { ListResponse } from './../../models/common';
-import { call, takeLatest, put } from 'redux-saga/effects';
+import { call, takeLatest, put, debounce } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { studentAction } from './studentSlice';
 import { ListParams } from '../../models';
@@ -15,6 +15,20 @@ function* fetchStudentList(action: PayloadAction<ListParams>) {
    }
 }
 
+function* handleSearchDebounce(action: PayloadAction<ListParams>) {
+   yield put(studentAction.setFilter(action.payload));
+}
+
+function* deleteStudent(action: PayloadAction<string>) {
+   try {
+      yield call(studentApi.remove, action.payload);
+   } catch (error) {
+      console.log(error);
+   }
+}
+
 export default function* studentSaga() {
    yield takeLatest(studentAction.fetchStudentList, fetchStudentList);
+   yield debounce(500, studentAction.setFilterWithDebounce.type, handleSearchDebounce);
+   yield takeLatest(studentAction.deleteStudent, deleteStudent);
 }
