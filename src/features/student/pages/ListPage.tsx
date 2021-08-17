@@ -3,6 +3,7 @@ import { Pagination } from '@material-ui/lab';
 import { selectCityList, selectCityMap } from 'features/city/citySlice';
 import { ListParams, Student } from 'models';
 import React, { useEffect } from 'react';
+import { Link, useHistory, useRouteMatch } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { StudentFilter } from '../components/StudentFilters';
 import StudentTable from '../components/StudentTable';
@@ -42,6 +43,8 @@ export function ListPage(props: IListPageProps) {
    const dispatch = useAppDispatch();
    const classes = useStyles();
 
+   const match = useRouteMatch();
+   const history = useHistory();
    useEffect(() => {
       dispatch(studentAction.fetchStudentList(filter));
    }, [dispatch, filter]);
@@ -60,22 +63,25 @@ export function ListPage(props: IListPageProps) {
       dispatch(studentAction.setFilter(newFilter));
    };
    const handleRemoveStudent = async (student: Student) => {
-      let newFilter = { ...filter };
       try {
-         // await studentApi.remove(student?.id || '');
          dispatch(studentAction.deleteStudent(student?.id || ''));
-         dispatch(studentAction.setFilter(newFilter));
       } catch (error) {
          console.log(error);
       }
+   };
+   const handleEditStudent = async (student: Student) => {
+      history.push(`${match.url}/${student.id}`);
    };
    return (
       <Box className={classes.root}>
          <Box className={classes.titleContainer}>
             <Typography variant='h4'>Students</Typography>
-            <Button variant='contained' color='primary'>
-               Add new
-            </Button>
+
+            <Link to={`${match.url}/add`} style={{ textDecoration: 'none' }}>
+               <Button variant='contained' color='primary'>
+                  Add new
+               </Button>
+            </Link>
          </Box>
 
          <Box mb={3}>
@@ -88,7 +94,12 @@ export function ListPage(props: IListPageProps) {
          </Box>
          {/* Table Student */}
          {loading && <LinearProgress className={classes.loading} />}
-         <StudentTable studentList={studentList} cityMap={cityMap} onRemove={handleRemoveStudent} />
+         <StudentTable
+            studentList={studentList}
+            cityMap={cityMap}
+            onEdit={handleEditStudent}
+            onRemove={handleRemoveStudent}
+         />
 
          <Box mt={2} display='flex' justifyContent='center'>
             <Pagination

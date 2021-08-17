@@ -85,14 +85,11 @@ export default function StudentTable({
                               className={classes.edit}
                               variant='contained'
                               color='primary'
-                              onClick={() => {
-                                 if (onEdit) {
-                                    onEdit(student);
-                                 }
-                              }}
+                              onClick={() => onEdit?.(student)}
                            >
                               Edit
                            </Button>
+
                            <Button
                               variant='outlined'
                               color='secondary'

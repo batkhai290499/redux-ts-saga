@@ -1,10 +1,10 @@
-import { Student } from './../../models/student';
-import { ListResponse } from './../../models/common';
-import { call, takeLatest, put, debounce } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { studentAction } from './studentSlice';
-import { ListParams } from '../../models';
+import { call, debounce, put, takeLatest } from 'redux-saga/effects';
 import studentApi from '../../api/studentApi';
+import { ListParams } from '../../models';
+import { ListResponse } from './../../models/common';
+import { Student } from './../../models/student';
+import { studentAction } from './studentSlice';
 
 function* fetchStudentList(action: PayloadAction<ListParams>) {
    try {
@@ -22,6 +22,7 @@ function* handleSearchDebounce(action: PayloadAction<ListParams>) {
 function* deleteStudent(action: PayloadAction<string>) {
    try {
       yield call(studentApi.remove, action.payload);
+      yield put(studentAction.fetchStudentList({ _page: 1, _limit: 15 }));
    } catch (error) {
       console.log(error);
    }
